@@ -1,0 +1,9 @@
+# このファイルは、テスト実行時にJestが読み込む設定ファイルです。
+# https://jestjs.io/docs/ja/configuration
+# 弾くファイルを指定することができます。
+# 以下の指定したフォルダーとファイルは開発する上では基本的に上げないのが基本的
+node_modules/
+# macOSのファイルを弾きます。
+.DS_Store 
+dist/
+mysql/sql/data/
