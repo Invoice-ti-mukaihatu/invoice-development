@@ -11,6 +11,9 @@ services: # コンテナの設定
       # - ./sql/init/:/docker-entrypoint-initdb.d 
       # my.cnf
       - ./sql/myconf/my.cnf:/etc/mysql/conf.d/my.cnf # my.cnfの設定とは、MySQLの設定ファイルをコンテナ内にマウントする
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
     environment: # 環境変数の設定とは、コンテナ内で使用する環境変数を設定する
       MYSQL_USER: user # ユーザー名
       MYSQL_PASSWORD: password # パスワード
