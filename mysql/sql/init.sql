@@ -1,3 +1,5 @@
+-- 1.ここがDBバーで使う、SQL文のファイル
+-- 2.SQLエディタを開き、下記のSQL文をコピペして、「SQLスクリプトを実行する」をクリックすると、DBにテーブルが作成される
 CREATE TABLE `users` (
     -- テーブル名は複数形
     `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -13,6 +15,7 @@ CREATE TABLE `users` (
 
 -- 文字コードはutf8
 --  NOT NULLは空白(空文字)はだめということ
+-- ここがAPIテスターで使う、POSTの部分になる（今回使う部分としては、"name","mail,"password"になる）
 INSERT INTO
     `users` (
         -- テーブル名は複数形
