@@ -1,0 +1,22 @@
+{
+    // ファイルを保存したときに自動的にフォーマットが適用
+    "editor.formatOnSave": true,
+    // フォーマットにPrettierを使用するように設定
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    // ファイルを保存したときにESLintによる自動修正も実行されるように設定
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    // ESLintの有効化対象とする言語を指定
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    // ESLintの適用対象とするディレクトリを指定
+    "eslint.workingDirectories": [
+        // tsconfig.jsonがある階層を指定,階層が違うとエラー表示
+        "./"
+    ]
+}

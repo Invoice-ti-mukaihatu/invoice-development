@@ -1,0 +1,41 @@
+{
+    // コードが実行される環境に関連する設定を指定
+    "env": {
+        "es2021": true,
+        // 環境に応じてenvは変更
+        "node": true,
+        "browser": true
+    },
+    // 使用するESLintの設定を指定
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+        // "prettier"
+    ],
+    // TypeScriptファイルを解析するために使用するパーサーを指定
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    // 使用するESLintプラグインを指定
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    // カスタムルールを設定
+    "rules": {
+        // any型の使用を禁止
+        "@typescript-eslint/no-explicit-any": 1,
+        // 非nullアサーション演算子(!)の使用を禁止
+        "@typescript-eslint/no-non-null-assertion": 1,
+        // 整形時にセミコロンが挿入
+        "semi": [
+            "error",
+            "always"
+        ],
+        // OFFだとコード内の変数や引数の未使用に関する警告が非表示
+        "@typescript-eslint/no-unused-vars": "off"
+    },
+    // .eslintrc.jsonファイルがルートディレクトリであることを指定
+    "root": true
+}

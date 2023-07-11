@@ -89,15 +89,15 @@ const connection = mysql2.createConnection({
 // それをthrowで投げています。
 // これにより、エラーが発生した場合には、アプリケーションが停止するようになります。
 // また、接続に成功した場合は、コンソールにconnected mysqlと表示しています。
-  connection.connect((err: any) => {
+connection.connect((err) => {
 
-    // データベースに接続できたらコンソールにconnected mysqlと表示
-    // // 接続できなかった場合エラーを投げる
-    if (err) throw err;
+  // データベースに接続できたらコンソールにconnected mysqlと表示
+  // // 接続できなかった場合エラーを投げる
+  if (err) throw err;
 
-    // データベースに接続できたらコンソールにconnected mysqlと表示
-    console.log("connected mysql");
-  });
+  // データベースに接続できたらコンソールにconnected mysqlと表示
+  console.log("connected mysql");
+});
 
 // ルーティングを定義する
 // 具体的には、Expressのappインスタンスに対するルーティング定義を行っています。
@@ -151,7 +151,7 @@ app.get("/users/:id", (req, res) => {
   connection.query(sql, { id: id }, (err, results: RowDataPacket[]) => {
 
     // データベースから取得したレコードが配列でresultsに渡されます。
-    console.log(results)
+    console.log(results);
 
     // エラーが発生した場合は、エラーを投げています。
     if (err) throw err;
