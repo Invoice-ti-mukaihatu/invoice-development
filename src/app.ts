@@ -1,76 +1,30 @@
-// このファイルは、アプリケーションのエントリーポイント（始めの部分）です。
-// ここからアプリケーションを起動します。
-
-// 必要なモジュールを読み込む
-// 具体的には、expressモジュール、corsモジュール、mysql2モジュールを読み込んでいます。
-// これらのモジュールは、npm installコマンドでインストールしてください。
-
-// expressモジュールを読み込み、expressという名前の変数に格納しています。
 import express from "express";
-
-// corsモジュールを読み込み、corsという名前の変数に格納しています。
 import cors from "cors";
-
 import * as dotenv from "dotenv";
-
-
-// mysql2モジュールを読み込み、mysql2という名前の変数に格納しています。
 import mysql2, { Connection, ResultSetHeader, RowDataPacket } from "mysql2";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 async function main() {
-  // アプリケーションを起動する
-  // 具体的には、expressモジュールのインスタンスを生成して、サーバを起動しています。
-  // このメソッドの引数には、接続に必要な情報を指定します。
-  // これらの情報は、MySQLサーバをインストールしたときに設定したものを指定してください。
-
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
-
-  // エラーハンドリングを行う
-  // 具体的には、app.useメソッドを呼び出して、エラーハンドリングを行っています。
-  // このメソッドの引数には、エラーを処理するための関数を指定します。
-  // この関数の引数には、エラーオブジェクトが渡されます。
-  // この例では、エラーオブジェクトをコンソールに出力しています。
-
   // ヘッダーの表示を消す
   app.disable('x-powered-by');
-
   // jsonの送信を許可
-  app.use(cors()).use(express.json());
-
+  app.use(cors({
+    credentials: true,
+    origin: "http://localhost:4000"
+  }));
   //.envファイルの読み込み
   dotenv.config();
-  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
+  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, JWT_SECRET_KEY } = process.env;
 
-  // サーバを起動する
-  // 具体的には、app.listenメソッドを呼び出して、サーバを起動しています。
-  // このメソッドの引数には、ポート番号を指定します。
-  // この例では、ポート番号3000を指定しています。
-
-  // アプリケーションを開始し、ポート3000で待機します。
-  // 1. Dockerを立ち上げる docker-compose up -d（今回の開発の全体のファイル構成的にはmysqlディレクトリに移動してDockerコマンドを打つ）
-  // 2. ターミナルで、npm run devコマンドを実行し、URLに、http://localhost:3000/usersを指定してアクセスしてください。
-  // 3. ブラウザに、何かしらのデータが表示されれば、正常に動作しています。
-  // 4. npm run devを停止する時は、ターミナルでcontrol + cキーを押してください。
-  // 5. Dockerを停止する時は、ターミナルでcontrol + cキーを押し、docker-compose downを実行する
   app.listen(3000, () => {
     // サーバが正常に開始したことをログに記録します。
     console.log("Start on port 3000.");
   });
-
-  // データベースに接続する
-  // 具体的には、mysql2モジュールのcreateConnectionメソッドを呼び出して、データベースに接続しています。
-  // 接続に必要な情報は、ホスト名、ポート番号、ユーザー名、パスワード、データベース名です。
-  // これらの情報は、MySQLサーバをインストールしたときに設定したものを指定してください。
-
-  // データベースに接続
-  // 1. Dockerが立ち上がってるのを確認する
-  // 2. ターミナルでmysqlディレクトリに移動し、docker exec -it my-mysql mysql -uroot -ppassコマンドを打つ
-  // 3. mysqlの中に入れたら、show databases;コマンドを打ち、invoice_dbがあることを確認する
-  // 4. ない場合は、create database invoice_db;コマンドを打つ
-  // 5. あれば、成功！問題なし！、そして、DBバーを開き接続を試みる
-  // 6. mysqlから出る時は、exitコマンドを打つ
-
   // mysqlに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
   const connection: Connection = mysql2.createConnection({
     host: MYSQL_HOST as string,
@@ -80,31 +34,99 @@ async function main() {
     database: MYSQL_DB as string,
   });
 
-  // データベースの接続を切断する
-  // 具体的には、connection.endメソッドを呼び出して、データベースの接続を切断しています。
-
-  // エラーが発生した場合の処理は、コールバック関数の引数errにエラーオブジェクトが渡されるので、
-  // それをthrowで投げています。
-  // これにより、エラーが発生した場合には、アプリケーションが停止するようになります。
-  // また、接続に成功した場合は、コンソールにconnected mysqlと表示しています。
   connection.connect((err) => {
-
-    // データベースに接続できたらコンソールにconnected mysqlと表示
     // // 接続できなかった場合エラーを投げる
     if (err) throw err;
-
     // データベースに接続できたらコンソールにconnected mysqlと表示
     console.log("connected mysql");
   });
 
-  // ルーティングを定義する
-  // 具体的には、Expressのappインスタンスに対するルーティング定義を行っています。
-  // この例では、GETメソッドで/testにアクセスしたときに、"hello"という文字列を返すように定義しています。
+  app.use(bodyParser.json());
+  app.use(cookieParser());
 
-  // GETテスト
-  app.get("/test", (req, res) => {
-    res.send("hello");
+  // ユーザー新規登録
+  app.post("/users", (req, res) => {
+    // リクエストボディからメールアドレスとパスワードを取得
+    const { email, password } = req.body;
+
+    const saltRounds = 10; // ハッシュ化のコストを指定、コストの値が高いほどハッシュ化が遅くなり、セキュリティが向上するっぽい
+    // パスワードのハッシュ化
+    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+      if (err) {
+        console.error("Error while hashing password:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // ハッシュ化されたパスワードとメールをuser変数へ代入
+      const user = { email, password: hashedPassword };
+
+      // user情報をDBに挿入するSQLクエリ文
+      const sql = 'insert into users set ?';
+      connection.query(sql, user, (err, result: ResultSetHeader) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            // ユニーク制約違反 (重複エラー)
+            // console.error("Duplicate entry for email:", email);
+            return res.status(400).json({ error: "このメールアドレスは既に登録されています。" });
+          } else {
+            // 上記以外のエラーの場合
+            // console.error("Error while inserting user:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+          }
+        }
+
+        res.status(201).json(result.insertId);
+      });
+    });
   });
+
+  //ログイン認証
+  app.post("/login", (req, res) => {
+    // リクエストボディからメールアドレスとパスワードを取得
+    const { email, password } = req.body;
+
+    // リクエストされたメールアドレスとパスワードが入力されているかチェック
+    if (!email || !password) {
+      return res.status(400).json({ error: "メールアドレスとパスワードが必要です。" });
+    }
+
+    // データベースからメールアドレス情報を取得
+    const sql = 'select * from users where email = ?';
+    connection.query(sql, [email], async (err, results: RowDataPacket[]) => {
+      // エラーが発生した場合は、エラーを投げています。
+      if (err) throw err;
+
+      // データベースに該当のメールアドレスがが存在しない場合のエラーハンドリング
+      if (results.length === 0) {
+        return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
+      }
+      // ユーザー情報を取得
+      const user = results[0];
+      // パスワードの一致チェック
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      // パスワードが一致しない場合のエラーハンドリング
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
+      }
+
+      // ユーザーが認証成功した場合、JWTトークンを生成して返す
+      const tokenPayload = { id: user.id }; // ユーザーIDをトークンに含める
+      const tokenOptions = { expiresIn: "30m" }; // 30分の有効期限を設定
+      const token = jwt.sign(tokenPayload, JWT_SECRET_KEY as string, tokenOptions);
+      // トークンをクッキーにセット
+      res.cookie("token", token, {
+        maxAge: 30 * 60 * 1000, // 30分の有効期限
+        httpOnly: true, // JavaScriptからクッキーにアクセス不可
+        secure: true, // セキュアな通信でのみ送信
+        sameSite: "strict" // SameSite属性を設定
+      });
+
+      // トークンを含むレスポンスを返す
+      return res.status(200).json({ token });
+    });
+  });
+
 
   // usersのレコードをすべてを取得する（GET）
   // app.getメソッドの第1引数には、ルーティングのパスを指定します。
@@ -159,30 +181,31 @@ async function main() {
     });
   });
 
+
   // usersのレコードを1件作成する（POST）
   // app.postメソッドの第1引数には、ルーティングのパスを指定します。
   // この例では、/usersというパスに対するルーティングを定義しています。
   // app.postメソッドの第2引数には、ルーティングに対する処理を定義します。
   // この例では、リクエストボディに含まれるデータをusersテーブルに挿入しています。
   // また、レスポンスとして、挿入したレコードのIDを返しています。
-  app.post("/users", (req, res) => {
+  // app.post("/users", (req, res) => {
 
-    // リクエストボディに含まれるデータを取得する
-    const user = req.body;
+  //   // リクエストボディに含まれるデータを取得する
+  //   const user = req.body;
 
-    // usersのレコードを1件作成する
-    const sql = 'insert into users set ?';
+  //   // usersのレコードを1件作成する
+  //   const sql = 'insert into users set ?';
 
-    // connection.queryメソッドを呼び出して、SQL文を実行しています。
-    connection.query(sql, user, (err, result: ResultSetHeader) => {
+  //   // connection.queryメソッドを呼び出して、SQL文を実行しています。
+  //   connection.query(sql, user, (err, result: ResultSetHeader) => {
 
-      // エラーが発生した場合は、エラーを投げています。
-      if (err) throw err;
+  //     // エラーが発生した場合は、エラーを投げています。
+  //     if (err) throw err;
 
-      // console.log(result)
-      res.status(201).json(result.insertId);
-    });
-  });
+  //     // console.log(result)
+  //     res.status(201).json(result.insertId);
+  //   });
+  // });
 
   // usersのレコードを1件更新する
   // app.putメソッドの第1引数には、ルーティングのパスを指定します。
@@ -205,7 +228,7 @@ async function main() {
     const sql = 'update users set ? where ?';
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
-    connection.query(sql, [user, { id: id }], (err, result) => {
+    connection.query(sql, [user, { id: id }], (err) => {
 
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
@@ -233,7 +256,7 @@ async function main() {
     const sql = 'delete from users where ?';
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
-    connection.query(sql, { id: id }, (err, result) => {
+    connection.query(sql, { id: id }, (err) => {
 
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
