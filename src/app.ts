@@ -8,18 +8,28 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 
 async function main() {
+  //.envファイルの読み込み
+  dotenv.config();
+  const {
+    MYSQL_HOST,
+    MYSQL_PORT,
+    MYSQL_USER,
+    MYSQL_PASS,
+    MYSQL_DB,
+    JWT_SECRET_KEY,
+    FRONT_BASE_URL,
+  } = process.env;
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
   // ヘッダーの表示を消す
-  app.disable('x-powered-by');
+  app.disable("x-powered-by");
   // jsonの送信を許可
-  app.use(cors({
-    credentials: true,
-    origin: "http://localhost:4000"
-  }));
-  //.envファイルの読み込み
-  dotenv.config();
-  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, JWT_SECRET_KEY } = process.env;
+  app.use(
+    cors({
+      credentials: true,
+      origin: FRONT_BASE_URL,
+    })
+  );
 
   app.listen(3000, () => {
     // サーバが正常に開始したことをログに記録します。
@@ -61,10 +71,10 @@ async function main() {
       const user = { email, password: hashedPassword };
 
       // user情報をDBに挿入するSQLクエリ文
-      const sql = 'insert into users set ?';
+      const sql = "insert into users set ?";
       connection.query(sql, user, (err, result: ResultSetHeader) => {
         if (err) {
-          if (err.code === 'ER_DUP_ENTRY') {
+          if (err.code === "ER_DUP_ENTRY") {
             // ユニーク制約違反 (重複エラー)
             // console.error("Duplicate entry for email:", email);
             return res.status(400).json({ error: "このメールアドレスは既に登録されています。" });
@@ -91,7 +101,7 @@ async function main() {
     }
 
     // データベースからメールアドレス情報を取得
-    const sql = 'select * from users where email = ?';
+    const sql = "select * from users where email = ?";
     connection.query(sql, [email], async (err, results: RowDataPacket[]) => {
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
@@ -119,14 +129,13 @@ async function main() {
         maxAge: 30 * 60 * 1000, // 30分の有効期限
         httpOnly: true, // JavaScriptからクッキーにアクセス不可
         secure: true, // セキュアな通信でのみ送信
-        sameSite: "strict" // SameSite属性を設定
+        sameSite: "strict", // SameSite属性を設定
       });
 
       // トークンを含むレスポンスを返す
       return res.status(200).json({ token });
     });
   });
-
 
   // usersのレコードをすべてを取得する（GET）
   // app.getメソッドの第1引数には、ルーティングのパスを指定します。
@@ -135,13 +144,11 @@ async function main() {
   // この例では、データベースからusersテーブルのレコードをすべて取得して、
   // JSON形式でレスポンスを返しています。
   app.get("/users", (req, res) => {
-
     // usersのレコードをすべて取得する
-    const sql = 'select * from users';
+    const sql = "select * from users";
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
     connection.query(sql, (err, result) => {
-
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
 
@@ -160,16 +167,14 @@ async function main() {
   // この例では、データベースからusersテーブルのレコードを1件取得して、
   // JSON形式でレスポンスを返しています。
   app.get("/users/:id", (req, res) => {
-
     // パスの:idの部分を取得する
     const id = req.params.id;
 
     // usersのレコードを1件取得する
-    const sql = 'select * from users where ?';
+    const sql = "select * from users where ?";
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
     connection.query(sql, { id: id }, (err, results: RowDataPacket[]) => {
-
       // データベースから取得したレコードが配列でresultsに渡されます。
       console.log(results);
 
@@ -180,7 +185,6 @@ async function main() {
       res.json(results[0]);
     });
   });
-
 
   // usersのレコードを1件作成する（POST）
   // app.postメソッドの第1引数には、ルーティングのパスを指定します。
@@ -217,7 +221,6 @@ async function main() {
   // この例では、リクエストボディに含まれるデータをusersテーブルに更新しています。
   // また、レスポンスとして、更新したレコードのIDを返しています。
   app.put("/users/:id", (req, res) => {
-
     // パスの:idの部分を取得する
     const id = req.params.id;
 
@@ -225,11 +228,10 @@ async function main() {
     const user = req.body;
 
     // usersのレコードを1件更新する
-    const sql = 'update users set ? where ?';
+    const sql = "update users set ? where ?";
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
     connection.query(sql, [user, { id: id }], (err) => {
-
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
 
@@ -248,16 +250,14 @@ async function main() {
   // この例では、usersテーブルからレコードを1件削除しています。
   // また、レスポンスとして、ステータスコード200を返しています。
   app.delete("/users/:id", (req, res) => {
-
     // パスの:idの部分を取得する
     const id = req.params.id;
 
     // usersのレコードを1件削除する
-    const sql = 'delete from users where ?';
+    const sql = "delete from users where ?";
 
     // connection.queryメソッドを呼び出して、SQL文を実行しています。
     connection.query(sql, { id: id }, (err) => {
-
       // エラーが発生した場合は、エラーを投げています。
       if (err) throw err;
 
