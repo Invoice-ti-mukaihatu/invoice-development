@@ -3,9 +3,11 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import mysql2, { Connection, ResultSetHeader, RowDataPacket } from "mysql2";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import { LoginController } from './controllers/loginController';
+import { connection } from './database';
 
 async function main() {
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
@@ -19,30 +21,34 @@ async function main() {
   }));
   //.envファイルの読み込み
   dotenv.config();
-  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, JWT_SECRET_KEY } = process.env;
+  // const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, JWT_SECRET_KEY } = process.env;
+  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
 
   app.listen(3000, () => {
     // サーバが正常に開始したことをログに記録します。
     console.log("Start on port 3000.");
   });
-  // mysqlに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
-  const connection: Connection = mysql2.createConnection({
-    host: MYSQL_HOST as string,
-    port: parseInt(MYSQL_PORT as string),
-    user: MYSQL_USER as string,
-    password: MYSQL_PASS as string,
-    database: MYSQL_DB as string,
-  });
+  // // mysqlに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
+  // const connection: Connection = mysql2.createConnection({
+  //   host: MYSQL_HOST as string,
+  //   port: parseInt(MYSQL_PORT as string),
+  //   user: MYSQL_USER as string,
+  //   password: MYSQL_PASS as string,
+  //   database: MYSQL_DB as string,
+  // });
 
-  connection.connect((err) => {
-    // // 接続できなかった場合エラーを投げる
-    if (err) throw err;
-    // データベースに接続できたらコンソールにconnected mysqlと表示
-    console.log("connected mysql");
-  });
+  // connection.connect((err) => {
+  //   // // 接続できなかった場合エラーを投げる
+  //   if (err) throw err;
+  //   // データベースに接続できたらコンソールにconnected mysqlと表示
+  //   console.log("connected mysql");
+  // });
 
   app.use(bodyParser.json());
   app.use(cookieParser());
+
+  app.use('/login', LoginController.router);
+
 
   // ユーザー新規登録
   app.post("/users", (req, res) => {
@@ -80,52 +86,52 @@ async function main() {
     });
   });
 
-  //ログイン認証
-  app.post("/login", (req, res) => {
-    // リクエストボディからメールアドレスとパスワードを取得
-    const { email, password } = req.body;
+  // //ログイン認証
+  // app.post("/login", (req, res) => {
+  //   // リクエストボディからメールアドレスとパスワードを取得
+  //   const { email, password } = req.body;
 
-    // リクエストされたメールアドレスとパスワードが入力されているかチェック
-    if (!email || !password) {
-      return res.status(400).json({ error: "メールアドレスとパスワードが必要です。" });
-    }
+  //   // リクエストされたメールアドレスとパスワードが入力されているかチェック
+  //   if (!email || !password) {
+  //     return res.status(400).json({ error: "メールアドレスとパスワードが必要です。" });
+  //   }
 
-    // データベースからメールアドレス情報を取得
-    const sql = 'select * from users where email = ?';
-    connection.query(sql, [email], async (err, results: RowDataPacket[]) => {
-      // エラーが発生した場合は、エラーを投げています。
-      if (err) throw err;
+  //   // データベースからメールアドレス情報を取得
+  //   const sql = 'select * from users where email = ?';
+  //   connection.query(sql, [email], async (err, results: RowDataPacket[]) => {
+  //     // エラーが発生した場合は、エラーを投げています。
+  //     if (err) throw err;
 
-      // データベースに該当のメールアドレスがが存在しない場合のエラーハンドリング
-      if (results.length === 0) {
-        return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
-      }
-      // ユーザー情報を取得
-      const user = results[0];
-      // パスワードの一致チェック
-      const passwordMatch = await bcrypt.compare(password, user.password);
+  //     // データベースに該当のメールアドレスがが存在しない場合のエラーハンドリング
+  //     if (results.length === 0) {
+  //       return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
+  //     }
+  //     // ユーザー情報を取得
+  //     const user = results[0];
+  //     // パスワードの一致チェック
+  //     const passwordMatch = await bcrypt.compare(password, user.password);
 
-      // パスワードが一致しない場合のエラーハンドリング
-      if (!passwordMatch) {
-        return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
-      }
+  //     // パスワードが一致しない場合のエラーハンドリング
+  //     if (!passwordMatch) {
+  //       return res.status(401).json({ error: "メールアドレスまたはパスワードが違います。" });
+  //     }
 
-      // ユーザーが認証成功した場合、JWTトークンを生成して返す
-      const tokenPayload = { id: user.id }; // ユーザーIDをトークンに含める
-      const tokenOptions = { expiresIn: "30m" }; // 30分の有効期限を設定
-      const token = jwt.sign(tokenPayload, JWT_SECRET_KEY as string, tokenOptions);
-      // トークンをクッキーにセット
-      res.cookie("token", token, {
-        maxAge: 30 * 60 * 1000, // 30分の有効期限
-        httpOnly: true, // JavaScriptからクッキーにアクセス不可
-        secure: true, // セキュアな通信でのみ送信
-        sameSite: "strict" // SameSite属性を設定
-      });
+  //     // ユーザーが認証成功した場合、JWTトークンを生成して返す
+  //     const tokenPayload = { id: user.id }; // ユーザーIDをトークンに含める
+  //     const tokenOptions = { expiresIn: "30m" }; // 30分の有効期限を設定
+  //     const token = jwt.sign(tokenPayload, JWT_SECRET_KEY as string, tokenOptions);
+  //     // トークンをクッキーにセット
+  //     res.cookie("token", token, {
+  //       maxAge: 30 * 60 * 1000, // 30分の有効期限
+  //       httpOnly: true, // JavaScriptからクッキーにアクセス不可
+  //       secure: true, // セキュアな通信でのみ送信
+  //       sameSite: "strict" // SameSite属性を設定
+  //     });
 
-      // トークンを含むレスポンスを返す
-      return res.status(200).json({ token });
-    });
-  });
+  //     // トークンを含むレスポンスを返す
+  //     return res.status(200).json({ token });
+  //   });
+  // });
 
 
   // usersのレコードをすべてを取得する（GET）
