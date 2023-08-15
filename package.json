@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p . ",
+    "start": "NODE_ENV=production forever start dist/app.js",
+    "restart": "NODE_ENV=production forever restart dist/app.js",
     "dev": "nodemon src/app.ts"
   },
   "repository": {
