@@ -11,24 +11,33 @@ import { LoginRepository } from './repositories/login/loginRepository';
 import bcrypt from "bcrypt";
 
 async function main() {
-  // expressモジュールのインスタンスを生成して、appという名前の変数に格納
+  //.envファイルの読み込み
+  dotenv.config();
+  const {
+    MYSQL_HOST,
+    MYSQL_PORT,
+    MYSQL_USER,
+    MYSQL_PASS,
+    MYSQL_DB,
+    FRONT_BASE_URL,
+  } = process.env;
+  // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
 
   // ヘッダーの表示を消す
-  app.disable('x-powered-by');
-  app.use(cors({
-    credentials: true,
-    origin: "http://localhost:4000"
-  }));
+  app.disable("x-powered-by");
+  // jsonの送信を許可
+  app.use(
+    cors({
+      credentials: true,
+      origin: FRONT_BASE_URL,
+    })
+  );
 
   // アプリケーションを開始し、ポート3000解放
   app.listen(3000, () => {
     console.log("Start on port 3000.");
   });
-
-  //.envファイルの読み込み
-  dotenv.config();
-  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
 
   // データベースに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
   const connection: Connection = await mysql2.createConnection({

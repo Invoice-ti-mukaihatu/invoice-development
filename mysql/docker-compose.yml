@@ -1,6 +1,6 @@
 version: "3.1" # docker-composeのバージョン指定
 services:
-  # コンテナの設定
+  # コンテナの設定.
   my-mysql:
     # コンテナ名
     image: mysql:8.0 # イメージ名とは、コンテナの元となるファイルシステムのこと
@@ -9,7 +9,7 @@ services:
     volumes:
       # ボリュームの設定とは、コンテナ内のデータをホスト側に永続化するための設定
       # 永続化用のマウント先とは、コンテナ内のデータをホスト側に永続化するための設定
-      # - ./sql/data:/var/lib/mysql 
+      # - ./sql/data:/var/lib/mysql
       # my.cnfの設定とは、MySQLの設定ファイルをコンテナ内にマウントする
       - ./sql/myconf/my.cnf:/etc/mysql/conf.d/my.cnf # 初期データとは、コンテナ起動時に実行するSQLファイルを指定する
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql

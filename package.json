@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p . ",
+    "start": "NODE_ENV=production forever start dist/app.js",
+    "restart": "NODE_ENV=production forever restart dist/app.js",
     "dev": "nodemon src/app.ts"
   },
   "repository": {
@@ -26,6 +29,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "forever": "^4.0.3",
     "jsonwebtoken": "^9.0.1",
     "mysql2": "^3.4.2",
     "ts-node": "^10.9.1",
