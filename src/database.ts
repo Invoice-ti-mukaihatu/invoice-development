@@ -1,8 +1,8 @@
 import mysql2, { Connection } from 'mysql2';
 import * as dotenv from 'dotenv';
 
+//.envファイルの読み込み
 dotenv.config();
-
 const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB } = process.env;
 
 export const connection: Connection = mysql2.createConnection({
