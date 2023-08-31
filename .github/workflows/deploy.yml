@@ -52,8 +52,11 @@ jobs:
           chmod 600 private_key
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /home/ec2-user/invoice_back && git pull origin main"
 
-          # 反映処理
+          # 反映処理(データベース)
+          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /home/ec2-user/invoice_back/mysql && docker compose down -v && docker compose up -d"
+
+          # 反映処理(バックエンド)
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /home/ec2-user/invoice_back && npm install && npm run build && npm run restart"
-                    
+
           # SSHのセキュリティグループを閉じる
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
