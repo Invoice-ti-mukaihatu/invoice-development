@@ -20,6 +20,7 @@ async function main() {
     MYSQL_PASS,
     MYSQL_DB,
     FRONT_BASE_URL,
+    PORT
   } = process.env;
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
@@ -35,8 +36,8 @@ async function main() {
   );
 
   // アプリケーションを開始し、ポート3000解放
-  app.listen(3000, () => {
-    console.log("Start on port 3000.");
+  app.listen(PORT, () => {
+    console.log(`Start on port ${PORT}.`);
   });
 
   // データベースに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
@@ -57,7 +58,7 @@ async function main() {
   const loginController = new LoginController(loginService);
 
   //ログインのエンドポイント
-  app.use('/login', loginController.getRouter());
+  app.use('/api', loginController.getRouter());
 
   // ユーザー新規登録のエンドポイント
   app.post("/users", async (req, res) => {

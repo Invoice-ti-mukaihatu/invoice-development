@@ -12,7 +12,7 @@ export class LoginController {
         this.router = Router();
 
         // POSTリクエスト(/login)が来たときの処理
-        this.router.post("/", async (req: Request, res: Response) => {
+        this.router.post("/login", async (req: Request, res: Response) => {
             try {
                 const { email, password } = req.body;
 
