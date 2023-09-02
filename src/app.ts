@@ -5,22 +5,18 @@ import { ResultSetHeader } from "mysql2";
 import mysql2, { Connection, RowDataPacket } from "mysql2/promise";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import { LoginController } from './controllers/login/loginController';
-import { LoginService } from './services/login/loginService';
-import { LoginRepository } from './repositories/login/loginRepository';
+import { LoginController } from "./controllers/login/loginController";
+import { LoginService } from "./services/login/loginService";
+import { LoginRepository } from "./repositories/login/loginRepository";
 import bcrypt from "bcrypt";
+import { UserRepository } from "./repositories/user/userRepository";
+import { UserService } from "./services/user/userService";
+import { UserController } from "./controllers/user/userController";
 
 async function main() {
   //.envファイルの読み込み
   dotenv.config();
-  const {
-    MYSQL_HOST,
-    MYSQL_PORT,
-    MYSQL_USER,
-    MYSQL_PASS,
-    MYSQL_DB,
-    FRONT_BASE_URL,
-  } = process.env;
+  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, FRONT_BASE_URL } = process.env;
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
 
@@ -55,9 +51,13 @@ async function main() {
   const loginRepository = new LoginRepository(connection);
   const loginService = new LoginService(loginRepository);
   const loginController = new LoginController(loginService);
-
   //ログインのエンドポイント
-  app.use('/login', loginController.getRouter());
+  app.use("/login", loginController.getRouter());
+
+  const userRepository = new UserRepository(connection);
+  const userService = new UserService(userRepository);
+  const userController = new UserController(userService);
+  app.use("/users", userController.getRouter());
 
   // ユーザー新規登録のエンドポイント
   app.post("/users", async (req, res) => {
@@ -71,7 +71,7 @@ async function main() {
       const user = { email, password: hashedPassword };
 
       // ユーザー情報のデータベースへの挿入
-      const sql = 'insert into users set ?';
+      const sql = "insert into users set ?";
       const [result] = await connection.query<ResultSetHeader>(sql, user);
 
       res.status(201).json(result.insertId);
@@ -86,13 +86,13 @@ async function main() {
   });
 
   function entryError(error: Error): boolean {
-    return error.message.includes('ER_DUP_ENTRY');
+    return error.message.includes("ER_DUP_ENTRY");
   }
 
   // usersのレコードをすべてを取得する（GET）
   app.get("/users", async (req, res) => {
     try {
-      const sql = 'select * from users';
+      const sql = "select * from users";
       const [result] = await connection.query<RowDataPacket[]>(sql);
 
       res.json(result);
