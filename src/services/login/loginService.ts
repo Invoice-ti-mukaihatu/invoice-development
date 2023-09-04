@@ -22,7 +22,7 @@ export class LoginService implements ILoginService {
 
         // 認証に失敗した場合、エラーを投げる
         if (userIdOrError instanceof Error) {
-            throw userIdOrError;
+            return userIdOrError;
         }
 
         // トークン生成のためのペイロードとオプション設定
