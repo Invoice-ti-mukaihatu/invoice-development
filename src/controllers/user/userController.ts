@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { IUserService } from "../../services/user/interface";
+import { authorization } from "../middlewares/auth";
 
 // ExpressのRouterインスタンスを作成
 export class UserController {
@@ -12,16 +13,17 @@ export class UserController {
     this.router = Router();
 
     // POSTリクエスト(/user)が来たときの処理
-    this.router.put("/", async (req: Request, res: Response) => {
+    this.router.put("/", authorization, async (req: Request, res: Response) => {
       try {
         const { username, email, name, address } = req.body;
-
         if (!username || !email || !name || !address) {
           return res
             .status(400)
             .json({ error: "ユーザー名、メールアドレス、氏名、住所は必須項目です。" });
         }
 
+        // tokenを取得
+        const userId = req.body.payload.id as number;
 
         // メールアドレスがすでに使われているかどうかをチェック
         const existEmailUser = await userService.checkForDuplicate(userId, email);
