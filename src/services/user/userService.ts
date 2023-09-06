@@ -1,4 +1,3 @@
-import { User } from "../../models/users";
 import { IUserRepository } from "../../repositories/user/interface";
 import { IUserService } from "./interface";
 import * as dotenv from "dotenv";
@@ -13,12 +12,34 @@ export class UserService implements IUserService {
     this.userRepository = userRepository;
   }
 
-  // メールアドレスをもとにユーザー情報を取得
-  public async getUserByEmail(email: string): Promise<User | null | Error> {
-    return await this.userRepository.getUserByEmail(email);
+  // メールアドレスがすでに使われているかどうかをチェック
+  public async checkForDuplicate(userId: number, email: string): Promise<boolean | null | Error> {
+    const user = await this.userRepository.getUserById(userId);
+    if (user instanceof Error || user === null) {
+      return user;
+    }
+
+    // メールアドレスが変更されていない場合はfalseを返す
+    if (user.email === email) {
+      return true;
+    }
+
+    // メールアドレスをもとにユーザー情報を取得
+    const existEmailUser = await this.userRepository.getUserByEmail(email);
+    if (existEmailUser instanceof Error || existEmailUser === null) {
+      return existEmailUser;
+    }
+
+    // メールアドレスがすでに使われている場合はtrueを返す
+    if (existEmailUser) {
+      return true;
+    }
+
+    // メールアドレスが使われていない場合はfalseを返す
+    return false;
   }
 
-  // ユーザーログインの処理
+  // ユーザー情報の更新
   public async updateUser(
     userId: number,
     username: string,

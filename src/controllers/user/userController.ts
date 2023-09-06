@@ -22,7 +22,9 @@ export class UserController {
             .json({ error: "ユーザー名、メールアドレス、氏名、住所は必須項目です。" });
         }
 
-        const existEmailUser = await userService.getUserByEmail(email);
+
+        // メールアドレスがすでに使われているかどうかをチェック
+        const existEmailUser = await userService.checkForDuplicate(userId, email);
 
         if (existEmailUser instanceof Error) {
           return res.status(500).json({ error: "内部サーバーエラー" });
@@ -32,10 +34,7 @@ export class UserController {
           return res.status(400).json({ error: "このメールアドレスはすでに使われています。" });
         }
 
-        // tokenからuser_idを取得
-        const userId = 1;
-
-        // ユーザー情報のメールを取得
+        // ユーザー情報の更新
         const user = await this.userService.updateUser(userId, username, email, name, address);
 
         if (user instanceof Error) {

@@ -10,6 +10,22 @@ export class UserRepository implements IUserRepository {
     this.connection = connection;
   }
 
+  // idをもとにユーザー情報を取得するメソッドの実装
+  public async getUserById(id: number): Promise<User | null | Error> {
+    try {
+      const sql = "SELECT * FROM users WHERE id = ?";
+      const [rows] = await this.connection.query<RowDataPacket[]>(sql, [id]);
+      if (rows.length === 0) {
+        return null;
+      }
+
+      const user = rows[0] as User;
+      return user;
+    } catch (error) {
+      return new Error(`UserRepository.getUserById() ERROR: ${error}`);
+    }
+  }
+
   // メールアドレスをもとにユーザー情報を取得するメソッドの実装
   public async getUserByEmail(email: string): Promise<User | null | Error> {
     try {
@@ -40,22 +56,4 @@ export class UserRepository implements IUserRepository {
       return new Error(`userRepository.updateUser() ERROR: ${error}`);
     }
   }
-
-  // // ユーザーの認証を行うメソッドの実装
-  // public async authenticate(email: string, password: string): Promise<number | Error> {
-  //   const sql = "SELECT * FROM users WHERE email = ?";
-  //   const [rows] = await this.connection.query<RowDataPacket[]>(sql, [email]);
-
-  //   if (rows.length === 0) {
-  //     return new Error("User not found");
-  //   }
-
-  //   const user = rows[0];
-  //   //&&の後ろはパスワードの比較を行うための処理
-  //   if (user && (await bcrypt.compare(password, user.password))) {
-  //     return user.id;
-  //   } else {
-  //     return new Error("Authentication failed");
-  //   }
-  // }
 }
