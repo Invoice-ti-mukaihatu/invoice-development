@@ -52,12 +52,12 @@ async function main() {
   const loginService = new LoginService(loginRepository);
   const loginController = new LoginController(loginService);
   //ログインのエンドポイント
-  app.use("/login", loginController.getRouter());
+  app.use("/", loginController.getRouter());
 
   const userRepository = new UserRepository(connection);
   const userService = new UserService(userRepository);
   const userController = new UserController(userService);
-  app.use("/users", userController.getRouter());
+  app.use("/", userController.getRouter());
 
   // ユーザー新規登録のエンドポイント
   app.post("/users", async (req, res) => {

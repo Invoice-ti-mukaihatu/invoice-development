@@ -13,7 +13,7 @@ export class UserController {
     this.router = Router();
 
     // POSTリクエスト(/user)が来たときの処理
-    this.router.put("/", authorization, async (req: Request, res: Response) => {
+    this.router.put("/users", authorization, async (req: Request, res: Response) => {
       try {
         const { username, email, name, address } = req.body;
         if (!username || !email || !name || !address) {
