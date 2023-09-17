@@ -21,7 +21,7 @@ export class UserService implements IUserService {
 
     // メールアドレスが変更されていない場合はfalseを返す
     if (user.email === email) {
-      return true;
+      return false;
     }
 
     // メールアドレスをもとにユーザー情報を取得
