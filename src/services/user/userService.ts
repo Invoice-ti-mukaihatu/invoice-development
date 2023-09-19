@@ -13,10 +13,10 @@ export class UserService implements IUserService {
   }
 
   // メールアドレスがすでに使われているかどうかをチェック
-  public async checkForDuplicate(userId: number, email: string): Promise<boolean | null | Error> {
+  public async checkForDuplicate(userId: number, email: string): Promise<boolean | Error> {
     const user = await this.userRepository.getUserById(userId);
     if (user instanceof Error || user === null) {
-      return user;
+      return new Error(`User not found`);
     }
 
     // メールアドレスが変更されていない場合はfalseを返す
@@ -26,7 +26,7 @@ export class UserService implements IUserService {
 
     // メールアドレスをもとにユーザー情報を取得
     const existEmailUser = await this.userRepository.getUserByEmail(email);
-    if (existEmailUser instanceof Error || existEmailUser === null) {
+    if (existEmailUser instanceof Error) {
       return existEmailUser;
     }
 

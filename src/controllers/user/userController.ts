@@ -29,7 +29,7 @@ export class UserController {
         const existEmailUser = await userService.checkForDuplicate(userId, email);
 
         if (existEmailUser instanceof Error) {
-          return res.status(500).json({ error: "内部サーバーエラー" });
+          return res.status(404).json(existEmailUser.message);
         }
 
         if (existEmailUser) {
