@@ -21,7 +21,7 @@ export class UserService implements IUserService {
 
     // メールアドレスが変更されていない場合はfalseを返す
     if (user.email === email) {
-      return true;
+      return false;
     }
 
     // メールアドレスをもとにユーザー情報を取得
@@ -48,5 +48,28 @@ export class UserService implements IUserService {
     address: string
   ): Promise<void | Error> {
     return this.userRepository.updateUser(userId, username, email, name, address);
+  }
+
+  // ユーザー情報の取得
+  public async getUserById(userId: number): Promise<
+    | {
+        username: string;
+        email: string;
+        name: string;
+        address: string;
+      }
+    | null
+    | Error
+  > {
+    const user = await this.userRepository.getUserById(userId);
+    if (user instanceof Error || user === null) {
+      return user;
+    }
+    return {
+      username: user.username,
+      email: user.email,
+      name: user.name,
+      address: user.address,
+    };
   }
 }

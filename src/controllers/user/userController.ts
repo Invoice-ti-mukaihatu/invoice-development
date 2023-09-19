@@ -13,7 +13,7 @@ export class UserController {
     this.router = Router();
 
     // POSTリクエスト(/user)が来たときの処理
-    this.router.put("/", authorization, async (req: Request, res: Response) => {
+    this.router.put("/users", authorization, async (req: Request, res: Response) => {
       try {
         const { username, email, name, address } = req.body;
         if (!username || !email || !name || !address) {
@@ -44,6 +44,30 @@ export class UserController {
         }
 
         return res.status(200).json("ok");
+      } catch (error) {
+        console.error("ログイン中にエラーが発生しました:", error);
+        return res.status(500).json({ error: "内部サーバーエラー" });
+      }
+    });
+
+    // POSTリクエスト(/user)が来たときの処理
+    this.router.get("/users/me", authorization, async (req: Request, res: Response) => {
+      try {
+        // tokenを取得
+        const userId = req.body.payload.id as number;
+
+        // ユーザー情報の更新
+        const user = await this.userService.getUserById(userId);
+
+        if (user instanceof Error) {
+          return res.status(500).json({ error: "内部サーバーエラー" });
+        }
+
+        if (user === null) {
+          return res.status(404).json({ error: "このユーザーは存在しません" });
+        }
+
+        return res.status(200).json(user);
       } catch (error) {
         console.error("ログイン中にエラーが発生しました:", error);
         return res.status(500).json({ error: "内部サーバーエラー" });

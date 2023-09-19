@@ -8,4 +8,14 @@ export interface IUserService {
     name: string,
     address: string
   ): Promise<void | Error>;
+  getUserById(userId: number): Promise<
+    | {
+        username: string;
+        email: string;
+        name: string;
+        address: string;
+      }
+    | null
+    | Error
+  >;
 }
