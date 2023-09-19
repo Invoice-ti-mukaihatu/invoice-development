@@ -11,10 +11,10 @@ export class LoginController {
     this.loginService = loginService;
     this.router = Router();
 
-    // POSTリクエスト(/login)が来たときの処理
-    this.router.post("/login", async (req: Request, res: Response) => {
-      try {
-        const { email, password } = req.body;
+        // POSTリクエスト(/login)が来たときの処理
+        this.router.post("/login", async (req: Request, res: Response) => {
+            try {
+                const { email, password } = req.body;
 
         // メールアドレスとパスワードの存在チェック
         if (!email || !password) {
