@@ -16,7 +16,15 @@ import { UserController } from "./controllers/user/userController";
 async function main() {
   //.envファイルの読み込み
   dotenv.config();
-  const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB, FRONT_BASE_URL } = process.env;
+  const {
+    MYSQL_HOST,
+    MYSQL_PORT,
+    MYSQL_USER,
+    MYSQL_PASS,
+    MYSQL_DB,
+    FRONT_BASE_URL,
+    PORT
+  } = process.env;
   // expressモジュールのインスタンスを生成して、appという名前の変数に格納しています。
   const app: express.Express = express();
 
@@ -31,8 +39,8 @@ async function main() {
   );
 
   // アプリケーションを開始し、ポート3000解放
-  app.listen(3000, () => {
-    console.log("Start on port 3000.");
+  app.listen(PORT, () => {
+    console.log(`Start on port ${PORT}.`);
   });
 
   // データベースに接続,mysql2のモジュールを使ってデータベース情報を変数connectionに入れる
@@ -52,12 +60,13 @@ async function main() {
   const loginService = new LoginService(loginRepository);
   const loginController = new LoginController(loginService);
   //ログインのエンドポイント
-  app.use("/", loginController.getRouter());
-
+  app.use('/api', loginController.getRouter());
   const userRepository = new UserRepository(connection);
   const userService = new UserService(userRepository);
   const userController = new UserController(userService);
-  app.use("/", userController.getRouter());
+  // ユーザー編集のエンドポイント
+  app.use("/api", userController.getRouter());
+
 
   // ユーザー新規登録のエンドポイント
   app.post("/users", async (req, res) => {
