@@ -32,9 +32,9 @@
         "semi": [
             "error",
             "always"
-        ],
+        ]
         // OFFだとコード内の変数や引数の未使用に関する警告が非表示
-        "@typescript-eslint/no-unused-vars": "off"
+        // "@typescript-eslint/no-unused-vars": "off"
     },
     // .eslintrc.jsonファイルがルートディレクトリであることを指定
     "root": true
