@@ -86,6 +86,8 @@ describe("LoginService", () => {
         name: "test",
         email: "test@gmail.com",
         password: "pass",
+        address: "東京",
+        username: "テスト"
       };
 
       // テスト用のリポジトリを生成
