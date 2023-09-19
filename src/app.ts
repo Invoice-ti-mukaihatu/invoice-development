@@ -64,6 +64,7 @@ async function main() {
   const userRepository = new UserRepository(connection);
   const userService = new UserService(userRepository);
   const userController = new UserController(userService);
+  // ユーザー編集のエンドポイント
   app.use("/api", userController.getRouter());
 
 
