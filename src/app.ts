@@ -61,6 +61,11 @@ async function main() {
   const loginController = new LoginController(loginService);
   //ログインのエンドポイント
   app.use('/api', loginController.getRouter());
+  const userRepository = new UserRepository(connection);
+  const userService = new UserService(userRepository);
+  const userController = new UserController(userService);
+  app.use("/api", userController.getRouter());
+
 
   // ユーザー新規登録のエンドポイント
   app.post("/users", async (req, res) => {
