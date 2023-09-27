@@ -1,14 +1,12 @@
 import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
-import { ResultSetHeader } from "mysql2";
 import mysql2, { Connection, RowDataPacket } from "mysql2/promise";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import { LoginController } from "./controllers/login/loginController";
 import { LoginService } from "./services/login/loginService";
 import { LoginRepository } from "./repositories/login/loginRepository";
-import bcrypt from "bcrypt";
 import { UserRepository } from "./repositories/user/userRepository";
 import { UserService } from "./services/user/userService";
 import { UserController } from "./controllers/user/userController";
@@ -66,37 +64,6 @@ async function main() {
   const userController = new UserController(userService);
   // ユーザー編集のエンドポイント
   app.use("/api", userController.getRouter());
-
-
-  // ユーザー新規登録のエンドポイント
-  app.post("/users", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-
-      // パスワードのハッシュ化
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-      const user = { email, password: hashedPassword };
-
-      // ユーザー情報のデータベースへの挿入
-      const sql = "insert into users set ?";
-      const [result] = await connection.query<ResultSetHeader>(sql, user);
-
-      res.status(201).json(result.insertId);
-    } catch (error: unknown) {
-      if (error instanceof Error && entryError(error)) {
-        return res.status(400).json({ error: "このメールアドレスは既に登録されています。" });
-      } else {
-        console.error("Error while inserting user:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-      }
-    }
-  });
-
-  function entryError(error: Error): boolean {
-    return error.message.includes("ER_DUP_ENTRY");
-  }
 
   // usersのレコードをすべてを取得する（GET）
   app.get("/users", async (req, res) => {

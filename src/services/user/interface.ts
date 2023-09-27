@@ -1,3 +1,5 @@
+import { User } from "../../models/users";
+
 export interface IUserService {
   // ログインするさ時のメソッド、正常時トークンを返す。エラーが発生した場合エラーを返す
   checkForDuplicate(userId: number, email: string): Promise<boolean | Error>;
@@ -10,12 +12,13 @@ export interface IUserService {
   ): Promise<void | Error>;
   getUserById(userId: number): Promise<
     | {
-        username: string;
-        email: string;
-        name: string;
-        address: string;
-      }
+      username: string;
+      email: string;
+      name: string;
+      address: string;
+    }
     | null
     | Error
   >;
+  createUser(user: User): Promise<number | Error>;
 }

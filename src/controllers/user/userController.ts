@@ -12,7 +12,35 @@ export class UserController {
     this.userService = userService;
     this.router = Router();
 
-    // POSTリクエスト(/user)が来たときの処理
+    // POSTリクエスト(/create)が来たときの処理
+    this.router.post("/create", async (req: Request, res: Response) => {
+      try {
+        const { name, email, password, address, username } = req.body;
+        if (!name || !email || !password || !address || !username) {
+          return res
+            .status(400)
+            .json({ error: "氏名、メールアドレス、パスワード、住所、ユーザー名は必須項目です。" });
+        }
+
+        const user = { name, email, password, address, username };
+
+        // ユーザーの新規登録
+        const result = await this.userService.createUser(user);
+
+        if (result instanceof Error) {
+          if (result.message === "already exist email") {
+            return res.status(400).json({ error: "このメールアドレスは既に登録されています。" });
+          }
+          return res.status(500).json({ error: "内部サーバーエラー" });
+        }
+
+        return res.status(201).json(result);
+      } catch (error) {
+        return res.status(500).json({ error: "内部サーバーエラー" });
+      }
+    });
+
+    // PUTリクエスト(/user)が来たときの処理
     this.router.put("/users", authorization, async (req: Request, res: Response) => {
       try {
         const { username, email, name, address } = req.body;
