@@ -59,6 +59,19 @@ export class LoginController {
         return res.status(500).json({ error: "内部サーバーエラー" });
       }
     });
+
+    // POSTリクエスト(/logout)が来たときの処理
+    this.router.post("/logout", (req: Request, res: Response) => {
+      try {
+        // トークンをクッキーから削除
+        res.clearCookie("token");
+
+        return res.status(200).json({ message: "ログアウトしました。" });
+      } catch (error) {
+        console.error("ログアウト中にエラーが発生しました:", error);
+        return res.status(500).json({ error: "内部サーバーエラー" });
+      }
+    });
   }
 
   public getRouter() {
