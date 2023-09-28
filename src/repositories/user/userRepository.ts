@@ -56,4 +56,13 @@ export class UserRepository implements IUserRepository {
       return new Error(`userRepository.updateUser() ERROR: ${error}`);
     }
   }
+
+  public async updatePassword(userId: number, hashedPassword: string): Promise<void | Error> {
+    try {
+      const sql = "UPDATE users SET password = ? WHERE id = ?";
+      await this.connection.query<RowDataPacket[]>(sql, [hashedPassword, userId]);
+    } catch (error) {
+      return new Error(`userRepository.updatePassword() ERROR: ${error}`);
+    }
+  }
 }

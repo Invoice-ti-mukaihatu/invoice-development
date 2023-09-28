@@ -8,6 +8,7 @@ export interface IUserService {
     name: string,
     address: string
   ): Promise<void | Error>;
+  updatePassword(userId: number, password: string): Promise<void | Error>;
   getUserById(userId: number): Promise<
     | {
         username: string;
@@ -18,4 +19,5 @@ export interface IUserService {
     | null
     | Error
   >;
+  checkPassword(userId: number, plainPassword: string): Promise<boolean>;
 }
