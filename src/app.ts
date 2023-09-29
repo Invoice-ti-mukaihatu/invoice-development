@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import mysql2, { Connection, RowDataPacket } from "mysql2/promise";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import { LoginController } from "./controllers/login/loginController";
 import { LoginService } from "./services/login/loginService";
@@ -50,10 +49,8 @@ async function main() {
     database: MYSQL_DB as string,
   });
 
-  // ミドルウェア設定: JSONリクエストのパースとクッキーのパース
+  // ミドルウェア設定: JSONリクエストのパース
   app.use(bodyParser.json());
-  app.use(cookieParser());
-
   const loginRepository = new LoginRepository(connection);
   const loginService = new LoginService(loginRepository);
   const loginController = new LoginController(loginService);
