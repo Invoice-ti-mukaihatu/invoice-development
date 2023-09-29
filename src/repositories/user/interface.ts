@@ -10,5 +10,6 @@ export interface IUserRepository {
     name: string,
     address: string
   ): Promise<void | Error>;
+  updatePassword(userId: number, hashedPassword: string): Promise<void | Error>;
   createUser(user: User): Promise<number | Error>;
 }

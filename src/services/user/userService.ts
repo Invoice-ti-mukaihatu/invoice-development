@@ -3,6 +3,7 @@ import { IUserService } from "./interface";
 import { User } from "../../models/users";
 import bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -74,6 +75,13 @@ export class UserService implements IUserService {
     return this.userRepository.updateUser(userId, username, email, name, address);
   }
 
+  // ユーザー情報の更新
+  public async updatePassword(userId: number, password: string): Promise<void | Error> {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return this.userRepository.updatePassword(userId, hashedPassword);
+  }
+
   // ユーザー情報の取得
   public async getUserById(userId: number): Promise<
     | {
@@ -95,5 +103,15 @@ export class UserService implements IUserService {
       name: user.name,
       address: user.address,
     };
+  }
+
+  // パスワードの比較
+  public async checkPassword(userId: number, plainPassword: string): Promise<boolean> {
+    const user = await this.userRepository.getUserById(userId);
+    // userが取得できない場合、falseを返す
+    if (user instanceof Error || user === null) {
+      return false;
+    }
+    return await bcrypt.compare(plainPassword, user.password);
   }
 }
