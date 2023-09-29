@@ -1,5 +1,5 @@
 import { User } from "../../models/users";
-import { RowDataPacket, Connection } from "mysql2/promise";
+import { RowDataPacket, Connection, ResultSetHeader } from "mysql2/promise";
 import { IUserRepository } from "./interface";
 
 export class UserRepository implements IUserRepository {
@@ -8,6 +8,16 @@ export class UserRepository implements IUserRepository {
   // コンストラクタでデータベース接続を受け取り保存
   constructor(connection: Connection) {
     this.connection = connection;
+  }
+
+  public async createUser(user: User): Promise<number | Error> {
+    try {
+      const sql = "INSERT INTO users SET ?";
+      const [result] = await this.connection.query<ResultSetHeader>(sql, user);
+      return result.insertId;
+    } catch (error) {
+      return new Error(`userRepository.createUser() ERROR: ${error}`);
+    }
   }
 
   // idをもとにユーザー情報を取得するメソッドの実装

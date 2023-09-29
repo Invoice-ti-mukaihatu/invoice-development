@@ -1,5 +1,7 @@
 import { IUserRepository } from "../../repositories/user/interface";
 import { IUserService } from "./interface";
+import { User } from "../../models/users";
+import bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
@@ -13,6 +15,28 @@ export class UserService implements IUserService {
     this.userRepository = userRepository;
   }
 
+  // ユーザーの新規登録
+  public async createUser(user: User): Promise<number | Error> {
+    try {
+      // メールアドレスがすでに存在するかチェック
+      const existEmailUser = await this.userRepository.getUserByEmail(user.email);
+      if (existEmailUser instanceof Error) {
+        return existEmailUser;
+      }
+
+      if (existEmailUser) {
+        return new Error("already exist email");
+      }
+      // パスワードのハッシュ化
+      const saltRounds = 10;
+      user.password = await bcrypt.hash(user.password, saltRounds);
+
+      const userId = await this.userRepository.createUser(user);
+      return userId;
+    } catch (error) {
+      return new Error(`userService.createUser() ERROR: ${error}`);
+    }
+  }
   // メールアドレスがすでに使われているかどうかをチェック
   public async checkForDuplicate(userId: number, email: string): Promise<boolean | Error> {
     const user = await this.userRepository.getUserById(userId);
@@ -61,11 +85,11 @@ export class UserService implements IUserService {
   // ユーザー情報の取得
   public async getUserById(userId: number): Promise<
     | {
-        username: string;
-        email: string;
-        name: string;
-        address: string;
-      }
+      username: string;
+      email: string;
+      name: string;
+      address: string;
+    }
     | null
     | Error
   > {
