@@ -1,7 +1,6 @@
 import { IUserRepository } from "../../repositories/user/interface";
 import { IUserService } from "./interface";
 import { User } from "../../models/users";
-import bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
@@ -85,11 +84,11 @@ export class UserService implements IUserService {
   // ユーザー情報の取得
   public async getUserById(userId: number): Promise<
     | {
-      username: string;
-      email: string;
-      name: string;
-      address: string;
-    }
+        username: string;
+        email: string;
+        name: string;
+        address: string;
+      }
     | null
     | Error
   > {
