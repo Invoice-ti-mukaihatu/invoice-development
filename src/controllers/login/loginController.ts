@@ -45,33 +45,15 @@ export class LoginController {
           return res.status(401).json({ error: "認証に失敗しました。" });
         }
 
-        // トークンをクッキーに設定して返す
-        res.cookie("token", tokenOrError, {
-          maxAge: 30 * 60 * 1000,
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-        });
 
-        return res.status(200).json({ token: tokenOrError });
+
+        return res.status(200).json(tokenOrError);
       } catch (error) {
         console.error("ログイン中にエラーが発生しました:", error);
         return res.status(500).json({ error: "内部サーバーエラー" });
       }
     });
 
-    // POSTリクエスト(/logout)が来たときの処理
-    this.router.post("/logout", (req: Request, res: Response) => {
-      try {
-        // トークンをクッキーから削除
-        res.clearCookie("token");
-
-        return res.status(200).json({ message: "ログアウトしました。" });
-      } catch (error) {
-        console.error("ログアウト中にエラーが発生しました:", error);
-        return res.status(500).json({ error: "内部サーバーエラー" });
-      }
-    });
   }
 
   public getRouter() {
