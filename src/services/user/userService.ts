@@ -84,11 +84,11 @@ export class UserService implements IUserService {
   // ユーザー情報の取得
   public async getUserById(userId: number): Promise<
     | {
-        username: string;
-        email: string;
-        name: string;
-        address: string;
-      }
+      username: string;
+      email: string;
+      name: string;
+      address: string;
+    }
     | null
     | Error
   > {
@@ -113,4 +113,15 @@ export class UserService implements IUserService {
     }
     return await bcrypt.compare(plainPassword, user.password);
   }
+
+  public async getUserIcon(userId: number): Promise<string | null | Error> {
+    try {
+      // ユーザーのアイコンURLをデータベースから取得
+      const imageUrl = await this.userRepository.getUserIcon(userId);
+      return imageUrl;
+    } catch (error) {
+      return new Error(`ユーザーアイコンの取得エラー: ${error}`);
+    }
+  }
 }
+
