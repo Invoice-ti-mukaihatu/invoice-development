@@ -76,7 +76,7 @@ INSERT INTO
 VALUES
     (
         1,
-        'https://invoice-front-images.s3.ap-northeast-1.amazonaws.com/cooking_syouyu_bottle.png',
+        'https://invoice-front-images.s3.ap-northeast-1.amazonaws.com/87DD9D2F-0762-4539-BDF2-49A698AE7C67_1_102_a.jpeg',
         1
     ),
     (
