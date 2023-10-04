@@ -12,4 +12,5 @@ export interface IUserRepository {
   ): Promise<void | Error>;
   updatePassword(userId: number, hashedPassword: string): Promise<void | Error>;
   createUser(user: User): Promise<number | Error>;
+  getUserIcon(userId: number): Promise<string | null | Error>;
 }

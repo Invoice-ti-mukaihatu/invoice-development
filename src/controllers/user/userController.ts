@@ -130,6 +130,27 @@ export class UserController {
         return res.status(500).json({ error: "内部サーバーエラー" });
       }
     });
+
+    this.router.get("/users/icon", authorization, async (req: Request, res: Response) => {
+      try {
+        // トークンからuserIdを取得
+        const userId = req.body.payload.id as number;
+        const imageUrl = await this.userService.getUserIcon(userId);
+
+        if (imageUrl instanceof Error) {
+          return res.status(500).json({ error: "内部サーバーエラー" });
+        }
+
+        if (!imageUrl) {
+          return res.status(404).json({ error: "画像が見つかりません" });
+        }
+
+        return res.status(200).json({ image_url: imageUrl });
+      } catch (error) {
+        console.error("ユーザーアイコンの取得中にエラーが発生しました:", error);
+        return res.status(500).json({ error: "内部サーバーエラー" });
+      }
+    });
   }
 
   public getRouter() {

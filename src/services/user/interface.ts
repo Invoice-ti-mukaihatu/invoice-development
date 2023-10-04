@@ -13,14 +13,15 @@ export interface IUserService {
   updatePassword(userId: number, password: string): Promise<void | Error>;
   getUserById(userId: number): Promise<
     | {
-        username: string;
-        email: string;
-        name: string;
-        address: string;
-      }
+      username: string;
+      email: string;
+      name: string;
+      address: string;
+    }
     | null
     | Error
   >;
   checkPassword(userId: number, plainPassword: string): Promise<boolean>;
   createUser(user: User): Promise<number | Error>;
+  getUserIcon(userId: number): Promise<string | null | Error>;
 }

@@ -75,4 +75,22 @@ export class UserRepository implements IUserRepository {
       return new Error(`userRepository.updatePassword() ERROR: ${error}`);
     }
   }
+
+  public async getUserIcon(userId: number): Promise<string | null | Error> {
+    try {
+      // userIdを使ってユーザーのアイコンURLをデータベースから取得
+      const sql = "SELECT image_url FROM icons WHERE user_id = ?";
+      const [result] = await this.connection.query<RowDataPacket[]>(sql, [userId]);
+
+      if (result.length > 0) {
+        const imageUrl = result[0].image_url;
+        console.log("image_url:", imageUrl);
+        return imageUrl;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      return new Error(`UserRepository.getUserIcon() エラー: ${error}`);
+    }
+  }
 }
